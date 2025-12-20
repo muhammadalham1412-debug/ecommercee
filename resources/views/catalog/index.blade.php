@@ -6,7 +6,14 @@
 @extends('layouts.app')
 
 @section('title', 'Katalog Produk')
-
+<style>
+.pagination {
+    font-size: 13px;           /* Mengecilkan teks */
+}
+.page-link {
+    padding: 4px 8px;        /* Mengecilkan padding */
+}
+</style>
 @section('content')
 <div class="container py-4">
     <div class="row">
@@ -148,9 +155,10 @@
                 </div>
 
                 {{-- Pagination --}}
-                <div class="d-flex justify-content-center mt-5">
-                    {{ $products->links() }}
+                <div class="d-flex justify-content-center mt-5 small">
+                    {{ $products->links('pagination::bootstrap-5') }}
                 </div>
+
             @else
                 <div class="text-center py-5">
                     <i class="bi bi-search display-1 text-muted"></i>
