@@ -4,6 +4,7 @@
 namespace App\Observers;
 
 use App\Models\Product;
+use Spatie\Activitylog\Models\Activity;
 use Illuminate\Support\Facades\Cache;
 
 class ProductObserver
@@ -19,9 +20,9 @@ class ProductObserver
 
         // Log activity
         activity()
-            ->performedOn($product)
-            ->causedBy(auth()->user())
-            ->log('Produk baru dibuat: ' . $product->name);
+        ->performedOn($product)
+        ->causedBy(auth()->user())
+        ->log('Produk baru dibuat: ' . $product->name);
     }
 
     /**
