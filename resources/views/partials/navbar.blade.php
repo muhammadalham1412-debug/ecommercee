@@ -88,11 +88,11 @@
                                     <i class="bi bi-person me-2"></i> Profil Saya
                                 </a>
                             </li>
-                            <li>
+                            {{-- <li>
                                 <a class="dropdown-item" href="{{ route('orders.index') }}">
                                     <i class="bi bi-bag me-2"></i> Pesanan Saya
                                 </a>
-                            </li>
+                            </li> --}}
                             @if(auth()->user()->isAdmin())
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
