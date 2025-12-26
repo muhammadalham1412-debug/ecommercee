@@ -1,116 +1,173 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="max-w-6xl mx-auto px-4 py-10">
 
-    {{-- Header --}}
-    <div class="flex justify-between items-center mb-8">
-        <div>
-            <h1 class="text-2xl font-bold text-gray-800">
-                Detail Pesanan
-            </h1>
-            <p class="text-sm text-gray-500">
-                Nomor Pesanan: <span class="font-medium">{{ $order->order_number }}</span>
-            </p>
-        </div>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
 
-        <span class="px-4 py-2 rounded-full text-sm font-semibold
-            @if($order->status === 'pending') bg-yellow-100 text-yellow-700
-            @elseif($order->status === 'paid') bg-green-100 text-green-700
-            @elseif($order->status === 'cancelled') bg-red-100 text-red-700
-            @else bg-gray-100 text-gray-700
-            @endif
-        ">
-            {{ ucfirst($order->status) }}
-        </span>
-    </div>
+            <div class="card shadow-sm">
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-        {{-- LEFT: Item Pesanan --}}
-        <div class="md:col-span-2 bg-white rounded-lg shadow">
-            <div class="p-6 border-b">
-                <h2 class="text-lg font-semibold text-gray-800">
-                    Item Pesanan
-                </h2>
-            </div>
-
-            <div class="divide-y">
-                @foreach($order->items as $item)
-                    <div class="p-6 flex justify-between items-center">
+                {{-- Header Order --}}
+                <div class="card-header bg-white border-bottom">
+                    <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <p class="font-medium text-gray-800">
-                                {{ $item->product_name }}
-                            </p>
-                            <p class="text-sm text-gray-500">
-                                {{ number_format($item->price, 0, ',', '.') }} × {{ $item->quantity }}
+                            <h1 class="h3 mb-1 fw-bold text-dark">
+                                Order #{{ $order->order_number }}
+                            </h1>
+                            <p class="text-muted mb-0">
+                                {{ $order->created_at->format('d M Y, H:i') }}
                             </p>
                         </div>
 
-                        <p class="font-semibold text-gray-800">
-                            Rp {{ number_format($item->subtotal, 0, ',', '.') }}
-                        </p>
+                        {{-- Status Badge --}}
+                        <span class="badge rounded-pill fs-6 px-4 py-2
+                            @switch($order->status)
+                                @case('pending')
+                                    bg-warning text-dark
+                                    @break
+                                @case('processing')
+                                    bg-primary text-white
+                                    @break
+                                @case('shipped')
+                                    bg-info text-white
+                                    @break
+                                @case('delivered')
+                                    bg-success text-white
+                                    @break
+                                @case('cancelled')
+                                    bg-danger text-white
+                                    @break
+                                @default
+                                    bg-secondary text-white
+                            @endswitch
+                        ">
+                            {{ ucfirst($order->status) }}
+                        </span>
                     </div>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- RIGHT: Ringkasan --}}
-        <div class="bg-white rounded-lg shadow sticky top-6">
-            <div class="p-6 border-b">
-                <h2 class="text-lg font-semibold text-gray-800">
-                    Ringkasan Pesanan
-                </h2>
-            </div>
-
-            <div class="p-6 space-y-4 text-sm">
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Status Pembayaran</span>
-                    <span class="font-medium">
-                        {{ ucfirst($order->payment_status ?? 'unpaid') }}
-                    </span>
                 </div>
 
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Nama Penerima</span>
-                    <span class="font-medium">
-                        {{ $order->shipping_name }}
-                    </span>
+                {{-- Detail Items --}}
+                <div class="card-body">
+                    <h3 class="h5 fw-semibold mb-4">Produk yang Dipesan</h3>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="border-0">Produk</th>
+                                    <th class="border-0 text-center">Qty</th>
+                                    <th class="border-0 text-end">Harga</th>
+                                    <th class="border-0 text-end">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($order->items as $item)
+                                <tr>
+                                    <td>{{ $item->product_name }}</td>
+                                    <td class="text-center">{{ $item->quantity }}</td>
+                                    <td class="text-end">
+                                        Rp {{ number_format($item->discount_price ?? $item->price, 0, ',', '.') }}
+                                    </td>
+                                    <td class="text-end">
+                                        Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot class="border-top border-3">
+                                @if($order->shipping_cost > 0)
+                                <tr>
+                                    <td colspan="3" class="pt-3 text-end">Ongkos Kirim:</td>
+                                    <td class="pt-3 text-end">
+                                        Rp {{ number_format($order->shipping_cost, 0, ',', '.') }}
+                                    </td>
+                                </tr>
+                                @endif
+                                <tr>
+                                    <td colspan="3" class="pt-3 text-end">
+                                        <strong class="h5 mb-0">TOTAL BAYAR:</strong>
+                                    </td>
+                                    <td class="pt-3 text-end">
+                                        <strong class="h4 mb-0 text-primary">
+                                            Rp {{ number_format($order->total_amount, 0, ',', '.') }}
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
                 </div>
 
-                <div class="flex justify-between">
-                    <span class="text-gray-600">No. Telepon</span>
-                    <span class="font-medium">
-                        {{ $order->shipping_phone }}
-                    </span>
-                </div>
-
-                <div>
-                    <p class="text-gray-600 mb-1">Alamat Pengiriman</p>
-                    <p class="font-medium">
+                {{-- Alamat Pengiriman --}}
+                <div class="card-body bg-light border-top">
+                    <h3 class="h5 fw-semibold mb-3">Alamat Pengiriman</h3>
+                    <address class="mb-0">
+                        <strong>{{ $order->shipping_name }}</strong><br>
+                        {{ $order->shipping_phone }}<br>
                         {{ $order->shipping_address }}
+                    </address>
+                </div>
+
+                {{-- Tombol Bayar (hanya jika pending) --}}
+                @if($order->status === 'pending' && $order->snap_token)
+                <div class="card-body bg-primary bg-opacity-10 border-top text-center">
+                    <p class="text-muted mb-4">
+                        Selesaikan pembayaran Anda sebelum batas waktu berakhir.
                     </p>
+                    <button id="pay-button" class="btn btn-primary btn-lg px-5 shadow-sm">
+                        <i class="bi bi-credit-card me-2"></i> Bayar Sekarang
+                    </button>
                 </div>
-
-                <hr>
-
-                <div class="flex justify-between text-base font-bold">
-                    <span>Total Pembayaran</span>
-                    <span>
-                        Rp {{ number_format($order->total_amount, 0, ',', '.') }}
-                    </span>
-                </div>
-
-                {{-- Tombol Aksi --}}
-                @if($order->status === 'pending')
-                    <a href="#"
-                       class="block text-center mt-6 bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700">
-                        Lanjutkan Pembayaran
-                    </a>
                 @endif
+
             </div>
         </div>
-
     </div>
 </div>
+
+{{-- Snap.js Integration --}}
+@if($order->snap_token)
+@push('scripts')
+{{-- Load Snap JS dari Midtrans --}}
+<script src="{{ config('midtrans.snap_url') }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const payButton = document.getElementById('pay-button');
+
+        if (payButton) {
+            payButton.addEventListener('click', function () {
+                // Disable button untuk mencegah double click
+                payButton.disabled = true;
+                payButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Memproses...';
+
+                window.snap.pay('{{ $order->snap_token }}', {
+                    onSuccess: function (result) {
+                        console.log('Payment Success:', result);
+                        window.location.href = '{{ route("orders.success", $order) }}';
+                    },
+                    onPending: function (result) {
+                        console.log('Payment Pending:', result);
+                        window.location.href = '{{ route("orders.pending", $order) }}';
+                    },
+                    onError: function (result) {
+                        console.log('Payment Error:', result);
+                        alert('Pembayaran gagal! Silakan coba lagi.');
+                        payButton.disabled = false;
+                        payButton.innerHTML = '<i class="bi bi-credit-card me-2"></i> Bayar Sekarang';
+                    },
+                    onClose: function () {
+                        console.log('Payment popup closed');
+                        payButton.disabled = false;
+                        payButton.innerHTML = '<i class="bi bi-credit-card me-2"></i> Bayar Sekarang';
+                    }
+                });
+            });
+        }
+    });
+</script>
+@endpush
+@endif
+
 @endsection

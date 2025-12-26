@@ -25,8 +25,8 @@
                     </a>
                 </div>
                 <div class="col-lg-6 d-none d-lg-block text-center">
-                    <img src="{{ asset('images/instaxmini') }}"
-                         alt="Shopping" class="img-fluid" style="max-height: 400px;">
+                    <img src="{{ asset('storage/images/kamera1-removebg-preview.png') }}"
+                         alt="" class="img-fluid" style="max-height: 400px; object-fit: contain;">
                 </div>
             </div>
         </div>
