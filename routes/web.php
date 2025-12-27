@@ -18,6 +18,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MidtransNotificationController;
+use App\Services\MidtransService;
 // ================================================
 // HALAMAN PUBLIK (Tanpa Login)
 // ================================================
@@ -99,7 +100,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 // ================================================
 Auth::routes();
 
-use App\Services\MidtransService;
+;
 
 // ================================================
 // GOOGLE OAUTH ROUTES

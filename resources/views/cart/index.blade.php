@@ -1,16 +1,22 @@
-{{-- FILE: resources/views/cart/index.blade.php --}}
+{{-- ================================================
+     FILE: resources/views/cart/index.blade.php
+     FUNGSI: Halaman keranjang belanja (Fixed Subtotal)
+     ================================================ --}}
+
 @extends('layouts.app')
 
 @section('title', 'Keranjang Belanja')
 
 @section('content')
+
 <div class="container py-4">
     <h2 class="mb-4">
         <i class="bi bi-cart3 me-2"></i>Keranjang Belanja
     </h2>
 
-    {{-- Cegah error jika $cart belum ada --}}
-    @if(isset($cart) && $cart->items->count())
+    @if($cart && $cart->items->count())
+        @php $grandTotal = 0; @endphp {{-- Inisialisasi Total Akhir --}}
+        
         <div class="row">
             {{-- Cart Items --}}
             <div class="col-lg-8 mb-4">
@@ -28,10 +34,15 @@
                             </thead>
                             <tbody>
                                 @foreach($cart->items as $item)
+                                    @php 
+                                        // Hitung subtotal secara manual: Harga x Jumlah
+                                        $itemSubtotal = $item->product->price * $item->quantity;
+                                        $grandTotal += $itemSubtotal;
+                                    @endphp
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="{{ $item->product->image_url ?? '/images/noimage.png' }}"
+                                                <img src="{{ $item->product->image_url }}"
                                                      class="rounded me-3"
                                                      width="60" height="60"
                                                      style="object-fit: cover;">
@@ -41,19 +52,16 @@
                                                         {{ Str::limit($item->product->name, 40) }}
                                                     </a>
                                                     <div class="small text-muted">
-                                                        {{ $item->product->category->name ?? '-' }}
+                                                        {{ $item->product->category->name ?? 'Kategori' }}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-
                                         <td class="text-center align-middle">
-                                            {{ $item->product->formatted_price ?? 'Rp 0' }}
+                                            Rp {{ number_format($item->product->price, 0, ',', '.') }}
                                         </td>
-
                                         <td class="text-center align-middle">
-                                            <form action="{{ route('cart.update', $item->id) }}" 
-                                                  method="POST"
+                                            <form action="{{ route('cart.update', $item->id) }}" method="POST"
                                                   class="d-inline-flex align-items-center">
                                                 @csrf
                                                 @method('PATCH')
@@ -65,18 +73,15 @@
                                                        onchange="this.form.submit()">
                                             </form>
                                         </td>
-
                                         <td class="text-end align-middle fw-bold">
-                                            Rp {{ number_format($item->subtotal, 0, ',', '.') }}
+                                            {{-- Tampilkan hasil hitungan manual --}}
+                                            Rp {{ number_format($itemSubtotal, 0, ',', '.') }}
                                         </td>
-
                                         <td class="align-middle">
-                                            <form action="{{ route('cart.remove', $item->id) }}" 
-                                                  method="POST">
+                                            <form action="{{ route('cart.remove', $item->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" 
-                                                        class="btn btn-sm btn-outline-danger"
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
                                                         onclick="return confirm('Hapus item ini?')">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
@@ -90,28 +95,27 @@
                 </div>
             </div>
 
-            {{-- Summary --}}
+            {{-- Order Summary --}}
             <div class="col-lg-4">
                 <div class="card shadow-sm">
                     <div class="card-header bg-white">
                         <h5 class="mb-0">Ringkasan Belanja</h5>
                     </div>
                     <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Total Barang</span>
-                            <span>{{ $cart->items->sum('quantity') }} item</span>
+                        <div class="d-flex justify-content-between mb-2" style="color: #4C80C0">
+                            <span>Total Harga ({{ $cart->items->sum('quantity') }} barang)</span>
+                            <span>Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
                         </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Total Harga</span>
-                            <span>Rp {{ number_format($cart->items->sum('subtotal'),0,',','.') }}</span>
-                        </div>
-
                         <hr>
-
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="fw-bold">Total</span>
+                            <span class="fw-bold fs-5" style="color: #4C80C0">
+                                Rp {{ number_format($grandTotal, 0, ',', '.') }}
+                            </span>
+                        </div>
                         <a href="{{ route('checkout.index') }}" class="btn btn-primary w-100 btn-lg">
                             <i class="bi bi-credit-card me-2"></i>Checkout
                         </a>
-
                         <a href="{{ route('catalog.index') }}" class="btn btn-outline-secondary w-100 mt-2">
                             <i class="bi bi-arrow-left me-2"></i>Lanjut Belanja
                         </a>
@@ -119,14 +123,12 @@
                 </div>
             </div>
         </div>
-
     @else
-        {{-- Keranjang Kosong --}}
+        {{-- Empty Cart --}}
         <div class="text-center py-5">
             <i class="bi bi-cart-x display-1 text-muted"></i>
             <h4 class="mt-3">Keranjang Kosong</h4>
-            <p class="text-muted">Belum ada produk di keranjang belanja kamu.</p>
-
+            <p class="text-muted">Belum ada produk di keranjang belanja kamu</p>
             <a href="{{ route('catalog.index') }}" class="btn btn-primary">
                 <i class="bi bi-bag me-2"></i>Mulai Belanja
             </a>

@@ -18,6 +18,7 @@ FUNGSI: Master layout untuk halaman customer/publik
     <meta name="description" content="@yield('meta_description', 'Toko online terpercaya dengan produk berkualitas')">
 
     {{-- Favicon --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     <link rel="icon" href="{{ asset('favicon.ico') }}">
 
     {{-- Google Fonts --}}
