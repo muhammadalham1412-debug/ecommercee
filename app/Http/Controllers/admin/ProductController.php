@@ -23,22 +23,8 @@ class ProductController extends Controller
      */
     public function index(Request $request): View
     {
-        $products = Product::query()
-        // Eager Loading: Meload relasi kategori & gambar utama sekaligus.
-        // Tanpa 'with', Laravel akan mengeksekusi 1 query tambahan untuk SETIAP baris produk (N+1 Problem).
-            ->with(['category', 'primaryImage'])
-
-        // Filter: Pencarian nama produk
-            ->when($request->search, function ($query, $search) {
-                $query->search($search); // Menggunakan Scope 'search' di Model Product
-            })
-        // Filter: Berdasarkan Kategori
-            ->when($request->category, function ($query, $categoryId) {
-                $query->where('category_id', $categoryId);
-            })
-            ->latest()           // Urut dari yang terbaru
-            ->paginate(15)       // Batasi 15 item per halaman
-            ->withQueryString(); // Memastikan parameter URL (?search=xx) tetap ada saat pindah halaman
+        // Hemat Memori
+        $products = Product::select('id', 'name', 'price', 'slug', 'image')->get(); // Memastikan parameter URL (?search=xx) tetap ada saat pindah halaman
 
         // Ambil data kategori untuk dropdown filter di view
         $categories = Category::active()->orderBy('name')->get();
@@ -56,6 +42,8 @@ class ProductController extends Controller
         $categories = Category::active()->orderBy('name')->get();
 
         return view('admin.products.create', compact('categories'));
+
+        // Hemat Memori
     }
 
     /**
@@ -102,6 +90,7 @@ class ProductController extends Controller
                 ->withInput()
                 ->with('error', 'Gagal menyimpan produk: ' . $e->getMessage());
         }
+
     }
 
     /**
