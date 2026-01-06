@@ -46,8 +46,13 @@ body {
   color: var(--text-dark);
 }
 
+.hero-gradiant {
+  background: rgb(2, 2, 122);
+}
+
 /* Navbar Custom */
 .navbar-brand {
+  color: rgb(2, 2, 122);
   font-weight: 700;
   font-size: 1.5rem;
 }

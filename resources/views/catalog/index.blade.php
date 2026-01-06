@@ -50,7 +50,7 @@ FUNGSI: Halaman katalog/daftar produk
 
                         {{-- Filter Harga --}}
                         <div class="mb-4">
-                            <h6 class="fw-bold mb-3">Rentang Harga</h6>
+                            <h6 class="fw-bold mb-3">Tentang Harga</h6>
                             <div class="row g-2">
                                 <div class="col-6">
                                     <input type="number" class="form-control form-control-sm" name="min_price"
